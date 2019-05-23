@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>hello world</div>
+    <div>
+      <div>
+        <input type="text" id="textInput" />
+        <button id="addBtn">add</button>
+      </div>
+      <ul id="textBox"></ul>
+    </div>
+    <script src="./jquery.js"></script>
+    <script>
+      function getJSON(param, cb) {
+        var { type, data, url } = param;
+        $.ajax({
+          type,
+          data,
+          url,
+          success: function(res) {
+            cb && cb(res);
+          },
+          error: function(err) {
+            console.log(err);
+          }
+        });
+      }
+      $("#addBtn").click(function() {
+        var title = $("#textInput").val();
+        var param = {
+          type: "post",
+          data: { title },
+          url: "/api/addMovie"
+        };
+        getJSON(param, function(res) {
+          console.log("res:", res);
+          if (res.status === 200) {
+            getData();
+            $("#textInput").val("");
+          }
+        });
+      });
+      getData();
+      function getData() {
+        var listParam = {
+          type: "post",
+          data: {},
+          url: "/api/getList"
+        };
+        getJSON(listParam, function(data) {
+          console.log("data:", data);
+          var html = "";
+          data.content.forEach(item => {
+            html += `<li><span>${
+              item.title
+            }</span><span class="delete-btn" data-id=${
+              item.id
+            } style="color:red;cursor:pointer">&nbsp;&nbsp;删除</span></li>`;
+          });
+          $("#textBox").html(html);
+        });
+      }
+      $("#textBox").on("click", ".delete-btn", function() {
+        var id = $(this).attr("data-id");
+        var param = {
+          type: "post",
+          data: { id },
+          url: "/api/deleteMovie"
+        };
+        getJSON(param, function(data) {
+          if (data.status === 200) {
+            getData();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
