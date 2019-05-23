@@ -5,7 +5,7 @@ const pool = mysql.createPool({
   user: "root",
   password: "root",
   host: "localhost",
-  limit: 30
+  connectionLimit: 30
 });
 
 const query = (sql, placeholder) => {
