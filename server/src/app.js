@@ -1,32 +1,25 @@
 const Koa = require("koa");
 const Router = require("koa-router");
-const cors = require("@koa/cors");
-const bodyParser = require("koa-bodyparser");
-const helmet = require("koa-helmet");
-const respond = require("koa-respond");
+const bodyparser = require("koa-bodyparser");
 const logger = require("koa-logger");
-const static = require("koa-static");
+const cors = require("@koa/cors");
 const path = require("path");
-var session = require("koa-session-minimal");
-var MysqlStore = require("koa-mysql-session");
+const static = require("koa-static");
 
-const port = process.env.PROT || "3009";
-const router = new Router();
 const app = new Koa();
-
-require("./router")(router);
-
-const staticPath = "../client/build";
+const router = new Router();
+const port = process.env.PORT || "3009";
+const staticPath = path.join(process.cwd(), "../client");
+const routerHandle = require("./router");
+routerHandle(router);
 
 app
-  .use(cors())
   .use(logger())
-  .use(bodyParser())
-  .use(helmet())
-  .use(respond())
+  .use(cors())
+  .use(bodyparser())
   .use(router.routes())
   .use(router.allowedMethods())
-  .use(static(path.join(process.cwd(), staticPath)))
+  .use(static(staticPath))
   .listen(port, () => {
-    console.log("hello koa!port:", port);
+    console.log("hello koa! port:", port);
   });
